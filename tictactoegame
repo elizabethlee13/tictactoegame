@@ -1,0 +1,328 @@
+# Elizabeth Lee
+
+import turtle
+import time
+import random
+
+# This list represents the board. It's a list
+# of nine strings, each of which is either
+# "X", "O", "_", representing, respectively,
+# a position occupied by an X, by an O, and
+# an unoccupied position. The first three
+# elements in the list represent the first row,
+# and so on. Initially, all positions are
+# unoccupied.
+the_board = [ "_", "_", "_",
+              "_", "_", "_",
+              "_", "_", "_"]
+win_combo= [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7],[2,5,8], [2,4,6], [0,4,8]]
+
+
+coord_by_position=[(-220, 130), (0,130), (220, 130), (-220, -75), (0, -75),
+                  (220, -75), (-220, -270), (0, -270), (220, -270)]
+
+def draw_board(board):
+    """
+    signature: list(str) -> NoneType
+    Given the current state of the game, draws
+    the board on the screen, including the
+    lines 
+    """
+    #Draws the grid for the board
+    turtle.clear()
+    turtle.penup()
+    turtle.bgcolor("lavender")
+    turtle.pensize(5)
+    turtle.goto(-300,100)
+    turtle.pendown()
+    turtle.forward(600)
+    turtle.backward(400)
+    for x in range(0,2):
+        turtle.left(90)
+        turtle.forward(200)
+        turtle.backward(600)
+        turtle.forward(200)
+    turtle.right(90)
+    turtle.forward(400)
+    turtle.backward(600)
+    turtle.penup()
+    turtle.goto(-300,-300)
+    turtle.right(90)
+    turtle.update()
+
+
+    #Draw the marks
+    for index in range(9):
+        x, y = coord_by_position[index]
+        mark = the_board[index]
+        if (mark=="O"):
+            draw_circle(x,y)
+        elif (mark=="X"):
+            draw_x(x,y)
+    
+
+def draw_x(x,y):
+    
+    """
+    signature: int,int -> NoneType
+    Draws an X given the x and y coordinates in the respectic
+    position based on where the user clicks on
+    """
+    #Draws an X
+    turtle.penup()
+    turtle.color("red")
+    turtle.goto(x-70,y+130)
+    turtle.pendown()
+    turtle.left(0)
+    turtle.right(45)
+    turtle.forward(200)
+    turtle.backward(100)
+    turtle.left(90)
+    turtle.forward(100)
+    turtle.backward(200)
+    turtle.right(45)
+    turtle.color("black")
+
+
+def draw_circle(x,y):
+    """
+    signature: int,int -> NoneType
+    Draws an O given the x and y coordinates in the respectic
+    position based on where the user clicks on
+    """
+    #Draws a circle
+    turtle.penup()
+    turtle.color("green")
+    turtle.goto(x,y)
+    turtle.pendown()
+    turtle.circle(80)
+    turtle.penup()
+    turtle.color("black")
+    
+
+
+def do_user_move(board, x, y):
+    """
+    signature: list(str), int, int -> bool
+    Given a list representing the state of the board
+    and an x,y screen coordinate pair indicating where
+    the user clicked, update the board
+    with an O in the corresponding position. Your
+    code will need to translate the screen coordinate
+    (a pixel position where the user clicked) into the
+    corresponding board position (a value between 0 and
+    8 inclusive, identifying one of the 9 board positions).
+    The function returns a bool indicated if
+    the operation was successful: if the user
+    clicks on a position that is already occupied
+    or outside of the board area, the move is
+    invalid, and the function should return False,
+    otherise True.
+    """
+    print("user clicked at "+str(x)+","+str(y))
+    
+    #Using the respective x and y values, the positions in each board are designated based on the ranges
+    
+    if ((-400<=x<=-100) and (100<=y<=400)):
+        position=0
+    if ((-100<=x<=100) and (100<=y<=400)):
+        position=1
+    if ((100<=x<=400) and (100<=y<=400)):
+        position=2
+    if ((-400<=x<=-100) and (-100<=y<=100)):
+        position=3
+    if ((-100<=x<=100) and (-100<=y<=100)):
+        position=4
+    if ((100<=x<=400) and (-100<=y<=100)):
+        position=5
+    if ((-400<=x<=-100) and (-400<=y<=-100)):
+        position=6
+    if ((-100<=x<=100) and (-400<=y<=-100)):
+        position=7
+    if ((100<=x<=400) and (-400<=y<=-100)):
+        position=8
+
+    #If the position is empty, an "O" is placed inside the position and
+    #True is returned because the move was successful. If the position is filled, False is returned.
+        
+    if ("_"==the_board[position]):
+        the_board[position]="O"
+        return True
+    else:
+        return False
+
+def reset():
+    """
+    signature: list(str) -> NoneType
+    After there is a winner or a stalemate,
+    the board is redrawn and the positions for
+    the board are set to be empty in preperation for
+    a new game.
+    """
+    #Resets the board
+    turtle.color("black")
+    turtle.clear()
+    for x in range(9):
+        the_board[x]="_"
+    draw_board(the_board)
+    return (the_board)
+
+    
+def check_game_over(board):
+    """
+    signature: list(str) -> bool
+    Given the current state of the board, determine
+    if the game is over, by checking for
+    a three-in-a-row pattern in horizontal,
+    vertical, or diagonal lines; and also if the
+    game has reached a stalemate, achieved when
+    the board is full and no further move is possible.
+    If there is a winner or if there is a stalemante, display
+    an appropriate message to the user and clear the board
+    in preparation for the next round. If the game is over,
+    return True, otherwise False.
+    """
+    countofempty=0 
+
+    #Checks to see if there is a winner by going through all winning combinations
+    for combo in win_combo:
+        first=the_board[combo[0]]
+        second=the_board[combo[1]]
+        third=the_board[combo[2]]
+        #Situation in which all positions in the winning combinations are O
+        if (first=="O" and second=="O" and third=="O"):
+            print ("O wins!")
+            #Prints "O wins" on the screen with the board
+            turtle.penup()
+            turtle.pensize(10)
+            turtle.goto (-75, 0)
+            turtle.color("lightskyblue")
+            turtle.write ("O wins!", font = ('Arial', 40, 'normal'))
+            time.sleep(1)
+            reset()
+            #True is returned because game is over
+            return True
+        #Situation in which all positions in the winning combinations are X
+        elif (first=="X" and second=="X" and third=="X"):
+            print ("X wins!")
+            #Prints "X wins" on the screen with the board
+            turtle.penup()
+            turtle.pensize(10)
+            turtle.goto (-75, 0)
+            turtle.color("mediumpurple")
+            turtle.write ("X wins!", font = ('Arial', 40, 'normal'))
+            time.sleep(1)
+            reset()
+            #True is returned because game is over
+            return True
+        #Checks to see if there are empty spaces in the board left
+        #If there is an empty space, the count for the number of empty spaces is increased by 1
+        else:
+            for pos in range(9):
+                if the_board[pos]=="_":
+                    countofempty+=1
+                    
+    #If the number of empty spaces is 0, there is a stalemate because no more moves are possible 
+    if (countofempty==0):
+        print("No more moves are possible. No winner.")
+        #Prints that there is a stalemate on the screen with the board
+        turtle.penup()
+        turtle.pensize(10)
+        turtle.goto (-250, 0)
+        turtle.color("blueviolet")
+        turtle.write ("No more moves are possible. No winner.", font = ('Arial', 30, 'normal'))
+        time.sleep(1)
+        reset()
+        #True is returned because game is over
+        return True
+    else:
+        #False is returned because game is not over
+        return False
+
+            
+def do_computer_move(board):
+    """
+    signature: list(str) -> NoneType
+    Given a list representing the state of the board,
+    select a position for the computer's move and
+    update the board with an X in an appropriate
+    position. The algorithm for selecting the
+    computer's move shall be as follows: if it is
+    possible for the computer to win in one move,
+    it must do so. If the human player is able 
+    to win in the next move, the computer must
+    try to block it. Otherwise, the computer's
+    next move may be any random, valid position
+    (selected with the random.randint function).
+    """
+    #Goes through all the winning combinations to insert an "X" in the correct position
+    for combo in win_combo:
+        emptypositions=[]
+        #Obtains whether an "O" or an "X" or "_" is in each position within the combination
+        first=the_board[combo[0]]
+        second=the_board[combo[1]]
+        third=the_board[combo[2]]
+        #If the first, second, and third positions within the combination are equal, the computer
+        #cannot make a move for that situation
+        if (first==second==third):
+            indexofempty=-1
+        #CHecks the 3 possible combinations for when there are 2 X's and one empty space.
+        #The computer inserts an "X" into the empty position to win the game
+        elif (first=="X" and second=="X" and third=="_"):
+            the_board[combo[2]]="X"
+        elif(second=="X" and third=="X" and first=="_"):
+            the_board[combo[0]]="X"
+        elif(first=="X" and third=="X" and second=="_"):
+            the_board[combo[1]]="X"
+        #CHecks the 3 possible combinations for when there are 2 O's and one empty space.
+        #The computer inserts an "O" into the empty position to block the user from winning
+        elif (first=="O" and second=="O" and third=="_"):
+            the_board[combo[2]]="X"
+        elif(second=="O" and third=="O" and first=="_"):
+             the_board[combo[0]]="X"
+        elif(first=="O" and third=="O" and second=="_"):
+            the_board[combo[1]]="X"
+        #If computer has no situatino for winning or blocking, computer inserts an X at a random empty position
+        else:
+            for x in range (9):
+                if the_board[x]=="_":
+                    emptypositions.append(x)
+            length=len(emptypositions)
+            if (length>0):
+                randomposition=random.choice(emptypositions)
+                the_board[randomposition]="X"
+                return
+
+        
+def clickhandler(x, y): 
+    """
+    signature: int, int -> NoneType
+    This function is called by turtle in response
+    to a user click. The parameters are the screen
+    coordinates indicating where the click happened.
+    The function will call other functions. You do not
+    need to modify this function, but you do need
+    to understand it.
+    """
+    flag = do_user_move(the_board,x,y)
+    if (flag==True):
+        draw_board(the_board)
+        if not (check_game_over(the_board)):
+            do_computer_move(the_board)
+            draw_board(the_board)
+            check_game_over(the_board)
+
+
+def main():
+    """
+    signature: () -> NoneType
+    Runs the tic-tac-toe game. You shouldn't
+    need to modify this function.
+    """
+    turtle.tracer(0,0)
+    turtle.hideturtle()
+    turtle.onscreenclick(clickhandler)
+    draw_board(the_board)
+    turtle.mainloop()
+
+main()
